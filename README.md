@@ -1,59 +1,97 @@
 # Healthcare Chatbot
 
-Welcome to the Healthcare Chatbot project! This application is designed to provide users with general wellness guidance through an interactive chatbot interface.
+A simple full-stack healthcare chatbot demo built with Flask and a lightweight HTML/CSS/JavaScript frontend.
+
+This project is designed for general wellness guidance only. It is not a replacement for professional medical advice, diagnosis, or treatment.
+
+## Features
+
+- Chat-style interface for general wellness questions
+- Quick prompts for symptoms, sleep, stress, nutrition, exercise, and hydration
+- Local chat history saved in the browser
+- Theme toggle and clear chat controls
+- Flask backend with a simple JSON chat endpoint
 
 ## Project Structure
 
-The project is organized as follows:
-
-```
-healthcare-chatbot
-├── public
-│   ├── index.html       # Main HTML document for the chatbot application
-│   ├── style.css        # Styles for the chatbot application
-│   └── script.js        # JavaScript code for handling user interactions
-├── server
-│   ├── app.py           # Server-side application written in Python
-│   └── requirements.txt  # Python dependencies for the server application
-├── .gitignore           # Files and directories to be ignored by Git
-├── README.md            # Documentation for the project
-└── LICENSE              # Licensing information for the project
+```text
+.
+|-- public/
+|   |-- index.html
+|   |-- script.js
+|   `-- style.css
+|-- server/
+|   |-- app.py
+|   `-- requirements.txt
+|-- .gitignore
+|-- LICENSE
+`-- README.md
 ```
 
-## Installation
+## Getting Started
 
-To set up the project locally, follow these steps:
+### 1. Clone the repository
 
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   ```
+```bash
+git clone <your-repository-url>
+cd healthcare-chatbot
+```
 
-2. Navigate to the project directory:
-   ```
-   cd healthcare-chatbot
-   ```
+### 2. Create and activate a virtual environment
 
-3. Install the required Python packages:
-   ```
-   pip install -r server/requirements.txt
-   ```
+Windows PowerShell:
 
-## Usage
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
 
-1. Start the server:
-   ```
-   python server/app.py
-   ```
+macOS/Linux:
 
-2. Open your web browser and navigate to `http://127.0.0.1:8000` to access the chatbot.
+```bash
+python -m venv venv
+source venv/bin/activate
+```
 
-3. Interact with the chatbot by typing your questions in the input area.
+### 3. Install dependencies
 
-## Contributing
+```bash
+pip install -r server/requirements.txt
+```
 
-Contributions are welcome! Please feel free to submit a pull request or open an issue for any suggestions or improvements.
+### 4. Run the app
+
+```bash
+python server/app.py
+```
+
+Then open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
+
+## API
+
+### `POST /chat`
+
+Request body:
+
+```json
+{
+  "text": "How can I improve my sleep?"
+}
+```
+
+Example response:
+
+```json
+{
+  "reply": "You said: How can I improve my sleep?"
+}
+```
+
+## Notes
+
+- The current backend returns a simple echo response and can be extended with real chatbot or AI logic.
+- For safety, healthcare-related answers should always include appropriate medical disclaimers if you connect this to an LLM or external service.
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
