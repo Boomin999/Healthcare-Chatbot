@@ -4,29 +4,60 @@ const sendButton = document.getElementById("sendButton");
 const inputBox = document.getElementById("inputBox");
 const chatbox = document.getElementById("chatbox");
 const categoryButtons = document.querySelectorAll(".categoryCard");
+const landingPage = document.getElementById("landingPage");
 const botAvatarUrl = "https://cdn-icons-png.flaticon.com/512/3209/3209993.png";
+const chatStorage = window.sessionStorage;
 
-if (localStorage.getItem("darkMode") === "enabled") {
-    document.body.classList.add("dark");
-    themeBtn.textContent = "Sun";
+function applyTheme(mode) {
+    const isDarkMode = mode === "enabled";
+    document.body.classList.toggle("dark", isDarkMode);
+    themeBtn.querySelector(".icon-text").textContent = isDarkMode ? "Sun" : "Moon";
 }
 
-themeBtn.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-    const isDarkMode = document.body.classList.contains("dark");
+applyTheme(localStorage.getItem("darkMode"));
 
-    themeBtn.textContent = isDarkMode ? "Sun" : "Moon";
-    localStorage.setItem("darkMode", isDarkMode ? "enabled" : "disabled");
+themeBtn.addEventListener("click", () => {
+    const nextMode = document.body.classList.contains("dark") ? "disabled" : "enabled";
+    localStorage.setItem("darkMode", nextMode);
+    applyTheme(nextMode);
 });
 
 function saveMessage(role, text) {
-    const history = JSON.parse(localStorage.getItem("chatHistory")) || [];
+    const history = JSON.parse(chatStorage.getItem("chatHistory")) || [];
     history.push({ role, text });
-    localStorage.setItem("chatHistory", JSON.stringify(history));
+    chatStorage.setItem("chatHistory", JSON.stringify(history));
+}
+
+function showChatView() {
+    landingPage.classList.remove("active");
+    landingPage.hidden = true;
+}
+
+function showLandingView() {
+    landingPage.hidden = false;
+    landingPage.classList.add("active");
+}
+
+function createBubble(role, text) {
+    const bubble = document.createElement("div");
+    bubble.className = `bubble ${role === "user" ? "user-bubble" : "bot-bubble"}`;
+
+    if (role === "bot") {
+        bubble.innerHTML = `
+            <img src="${botAvatarUrl}" class="avatar" alt="Assistant avatar">
+            <div class="typingArea"></div>
+        `;
+        bubble.querySelector(".typingArea").textContent = text;
+    } else {
+        bubble.textContent = text;
+    }
+
+    return bubble;
 }
 
 function addUserMessage(text, shouldSave = true) {
-    chatbox.innerHTML += `<div class="bubble user-bubble">${text}</div>`;
+    showChatView();
+    chatbox.appendChild(createBubble("user", text));
     chatbox.scrollTop = chatbox.scrollHeight;
 
     if (shouldSave) {
@@ -35,6 +66,8 @@ function addUserMessage(text, shouldSave = true) {
 }
 
 function typeBotMessage(fullText, shouldSave = true, instant = false) {
+    showChatView();
+
     const container = document.createElement("div");
     container.className = "bubble bot-bubble";
     container.innerHTML = `
@@ -69,7 +102,7 @@ function typeBotMessage(fullText, shouldSave = true, instant = false) {
 }
 
 function loadHistory() {
-    const history = JSON.parse(localStorage.getItem("chatHistory"));
+    const history = JSON.parse(chatStorage.getItem("chatHistory"));
     if (!history || history.length === 0) {
         return false;
     }
@@ -95,12 +128,14 @@ function showWelcomeMessage() {
 }
 
 function clearHistory() {
-    localStorage.removeItem("chatHistory");
+    chatStorage.removeItem("chatHistory");
     chatbox.innerHTML = "";
-    showWelcomeMessage();
+    showLandingView();
 }
 
 function addLoadingDots() {
+    showChatView();
+
     const bubble = document.createElement("div");
     bubble.className = "bubble bot-bubble";
     bubble.id = "loadingBubble";
@@ -134,6 +169,12 @@ async function send() {
 
         const data = await response.json();
         document.getElementById("loadingBubble")?.remove();
+
+        if (!response.ok) {
+            typeBotMessage(data.reply || "Something went wrong.");
+            return;
+        }
+
         typeBotMessage(data.reply);
     } catch (error) {
         document.getElementById("loadingBubble")?.remove();
@@ -159,6 +200,6 @@ categoryButtons.forEach((button) => {
 window.addEventListener("load", () => {
     const hasHistory = loadHistory();
     if (!hasHistory) {
-        showWelcomeMessage();
+        showLandingView();
     }
 });

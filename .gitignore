@@ -18,6 +18,7 @@ instance/
 # Environment files
 .env
 .env.*
+.env.local
 
 # Editor / OS files
 .DS_Store

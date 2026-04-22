@@ -4,35 +4,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Healthcare Chatbot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Healthcare Assistant</h1>
-            <p class="subtitle">General wellness guidance</p>
+    <div class="page-shell">
+        <div class="ambient ambient-left"></div>
+        <div class="ambient ambient-right"></div>
 
-            <div class="top-buttons">
-                <button id="themeToggle" class="theme-btn" type="button" aria-label="Toggle theme">Moon</button>
-                <button id="clearChat" class="clear-btn" type="button" aria-label="Clear chat">Clear</button>
+        <header class="site-header">
+            <div class="header-inner">
+                <div class="brand">
+                    <div class="brand-mark" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9-6-18-3 9H2"></path>
+                        </svg>
+                    </div>
+                    <div class="brand-copy">
+                        <p class="eyebrow">Wellness Support</p>
+                        <h1>Healthcare Assistant</h1>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <button id="themeToggle" class="icon-button" type="button" aria-label="Toggle theme">
+                        <span class="icon-text">Moon</span>
+                    </button>
+                    <button id="clearChat" class="icon-button" type="button" aria-label="Clear chat">
+                        <span class="icon-text">Clear</span>
+                    </button>
+                </div>
             </div>
-        </div>
+        </header>
 
-        <div id="healthCategories">
-            <button class="categoryCard" type="button" data-question="I have symptoms. What could it be?">Symptoms</button>
-            <button class="categoryCard" type="button" data-question="Give me sleep improvement tips">Sleep</button>
-            <button class="categoryCard" type="button" data-question="How can I reduce stress?">Mental Health</button>
-            <button class="categoryCard" type="button" data-question="Give me nutrition advice">Nutrition</button>
-            <button class="categoryCard" type="button" data-question="Give me simple exercises to stay fit">Exercise</button>
-            <button class="categoryCard" type="button" data-question="How much water should I drink daily?">Hydration</button>
-        </div>
+        <main class="app-shell">
+            <section id="landingPage" class="hero-panel active" aria-label="Welcome">
+                <div class="hero-copy">
+                    <span class="status-pill">Trusted health guidance</span>
+                    <h2>Feel better with a calmer, clearer chat experience.</h2>
+                    <p>
+                        Ask about symptoms, sleep, stress, hydration, nutrition, and everyday wellness.
+                        Your assistant keeps the experience simple while staying ready for real questions.
+                    </p>
+                </div>
 
-        <div id="chatbox"></div>
+                <div id="healthCategories" class="category-grid">
+                    <button class="categoryCard category-card symptoms" type="button" data-question="I have symptoms. What could it be?">
+                        <span class="category-icon" aria-hidden="true">+</span>
+                        <span class="category-title">Symptoms</span>
+                        <span class="category-desc">Talk through common signs and what to watch for.</span>
+                    </button>
+                    <button class="categoryCard category-card sleep" type="button" data-question="Give me sleep improvement tips">
+                        <span class="category-icon" aria-hidden="true">Zz</span>
+                        <span class="category-title">Sleep</span>
+                        <span class="category-desc">Build better rest habits and wind-down routines.</span>
+                    </button>
+                    <button class="categoryCard category-card mental" type="button" data-question="How can I reduce stress?">
+                        <span class="category-icon" aria-hidden="true">Hm</span>
+                        <span class="category-title">Mental Health</span>
+                        <span class="category-desc">Explore stress relief and emotional wellness tips.</span>
+                    </button>
+                    <button class="categoryCard category-card nutrition" type="button" data-question="Give me nutrition advice">
+                        <span class="category-icon" aria-hidden="true">Nu</span>
+                        <span class="category-title">Nutrition</span>
+                        <span class="category-desc">Get simple ideas for healthier daily choices.</span>
+                    </button>
+                    <button class="categoryCard category-card exercise" type="button" data-question="Give me simple exercises to stay fit">
+                        <span class="category-icon" aria-hidden="true">Go</span>
+                        <span class="category-title">Exercise</span>
+                        <span class="category-desc">Find beginner-friendly movement and fitness ideas.</span>
+                    </button>
+                    <button class="categoryCard category-card hydration" type="button" data-question="How much water should I drink daily?">
+                        <span class="category-icon" aria-hidden="true">H2</span>
+                        <span class="category-title">Hydration</span>
+                        <span class="category-desc">Check practical ways to stay refreshed each day.</span>
+                    </button>
+                </div>
+            </section>
 
-        <div class="input-area">
-            <input id="inputBox" placeholder="Type your question..." />
-            <button class="send-btn" type="button" id="sendButton">Send</button>
-        </div>
+            <section class="chat-panel">
+                <div class="chat-panel-header">
+                    <div>
+                        <p class="chat-label">Active conversation</p>
+                        <h3>General wellness guidance</h3>
+                    </div>
+                    <span class="chat-note">Responses are for informational use only.</span>
+                </div>
+
+                <div id="chatbox" class="chatbox" aria-live="polite"></div>
+
+                <div class="composer-wrap">
+                    <div class="input-area">
+                        <input id="inputBox" type="text" placeholder="Ask your healthcare question..." autocomplete="off" />
+                        <button class="send-btn" type="button" id="sendButton">Send</button>
+                    </div>
+                    <p class="disclaimer">
+                        This assistant provides general wellness information and is not a substitute for professional medical advice.
+                    </p>
+                </div>
+            </section>
+        </main>
     </div>
 
     <script src="script.js"></script>
