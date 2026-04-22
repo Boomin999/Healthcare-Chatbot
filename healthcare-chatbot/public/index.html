@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Healthcare Chatbot</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h2>🏥 Healthcare Assistant</h2>
+        <p class="subtitle">General wellness guidance</p>
+
+        <div class="top-buttons">
+            <button id="themeToggle" class="theme-btn">🌙</button>
+            <button id="clearChat" class="clear-btn">🗑️</button>
+        </div>
+    </div>
+
+    <!-- HEALTH CATEGORY CARDS -->
+    <div id="healthCategories">
+        <div class="categoryCard" onclick="quickAsk('I have symptoms. What could it be?')">🩺 Symptoms</div>
+        <div class="categoryCard" onclick="quickAsk('Give me sleep improvement tips')">😴 Sleep</div>
+        <div class="categoryCard" onclick="quickAsk('How can I reduce stress?')">🧠 Mental Health</div>
+        <div class="categoryCard" onclick="quickAsk('Give me nutrition advice')">🍎 Nutrition</div>
+        <div class="categoryCard" onclick="quickAsk('Give me simple exercises to stay fit')">💪 Exercise</div>
+        <div class="categoryCard" onclick="quickAsk('How much water should I drink daily?')">💧 Hydration</div>
+    </div>
+
+    <div id="chatbox"></div>
+
+    <div class="input-area">
+        <input id="inputBox" placeholder="Type your question..." />
+        <button class="send-btn" onclick="send()">Send</button>
+    </div>
+
+</div>
+
+<script>
+// ===== DARK MODE =====
+const themeBtn = document.getElementById("themeToggle");
+const body = document.body;
+
+if (localStorage.getItem("darkMode") === "enabled") {
+    body.classList.add("dark");
+    themeBtn.textContent = "☀️";
+}
+
+themeBtn.addEventListener("click", () => {
+    body.classList.toggle("dark");
+    themeBtn.textContent = body.classList.contains("dark") ? "☀️" : "🌙";
+    localStorage.setItem("darkMode",
+        body.classList.contains("dark") ? "enabled" : "disabled"
+    );
+});
+
+// ===== CHAT HISTORY SAVE/LOAD =====
+function saveMessage(role, text) {
+    let history = JSON.parse(localStorage.getItem("chatHistory")) || [];
+    history.push({ role, text });
+    localStorage.setItem("chatHistory", JSON.stringify(history));
+}
+
+function loadHistory() {
+    let history = JSON.parse(localStorage.getItem("chatHistory"));
+    if (!history || history.length === 0) return;
+
+    history.forEach(msg => {
+        if (msg.role === "user") addUserMessage(msg.text, false);
+        else typeBotMessage(msg.text, false, true); // no animation for history
+    });
+}
+
+function clearHistory() {
+    localStorage.removeItem("chatHistory");
+    chatbox.innerHTML = "";
+    showWelcomeMessage();
+}
+
+document.getElementById("clearChat").addEventListener("click", clearHistory);
+
+// ===== ADD USER MESSAGE =====
+function addUserMessage(text, save = true) {
+    let bubble = `<div class="bubble user-bubble">${text}</div>`;
+    chatbox.innerHTML += bubble;
+    chatbox.scrollTop = chatbox.scrollHeight;
+    if (save) saveMessage("user", text);
+}
+
+// ===== BOT MESSAGE TYPING EFFECT =====
+function typeBotMessage(fullText, save = true, instant = false) {
+    let container = document.createElement("div");
+    container.className = "bubble bot-bubble";
+
+    container.innerHTML = `
+        <img src="https://cdn-icons-png.flaticon.com/512/3209/3209993.png" class="avatar">
+        <div class="typingArea"></div>
+    `;
+
+    chatbox.appendChild(container);
+    let textBox = container.querySelector(".typingArea");
+    chatbox.scrollTop = chatbox.scrollHeight;
+
+    // Instant load (for chat history)
+    if (instant) {
+        textBox.textContent = fullText;
+        return;
+    }
+
+    // Typing animation
+    let i = 0;
+    function type() {
+        if (i < fullText.length) {
+            textBox.textContent += fullText.charAt(i);
+            i++;
+            chatbox.scrollTop = chatbox.scrollHeight;
+            setTimeout(type, 15);
+        }
+    }
+    type();
+
+    if (save) saveMessage("bot", fullText);
+}
+
+// ===== LOADING DOTS =====
+function addLoadingDots() {
+    let bubble = document.createElement("div");
+    bubble.className = "bubble bot-bubble";
+    bubble.id = "loadingBubble";
+
+    bubble.innerHTML = `
+        <img src="https://cdn-icons-png.flaticon.com/512/3209/3209993.png" class="avatar">
+        <div class="typingDots">
+            <span></span><span></span><span></span>
+        </div>
+    `;
+
+    chatbox.appendChild(bubble);
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+// ===== QUICK ASK =====
+function quickAsk(text) {
+    document.getElementById("inputBox").value = text;
+    send();
+}
+
+document.getElementById("inputBox").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") send();
+});
+
+// ===== SEND =====
+async function send() {
+    let text = document.getElementById("inputBox").value;
+    if (!text) return;
+
+    addUserMessage(text);
+    document.getElementById("inputBox").value = "";
+
+    addLoadingDots();
+
+    try {
+        const res = await fetch("http://127.0.0.1:8000/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text })
+        });
+
+        const data = await res.json();
+
+        document.getElementById("loadingBubble")?.remove();
+
+        typeBotMessage(data.reply);
+
+    } catch (error) {
+        document.getElementById("loadingBubble")?.remove();
+        typeBotMessage("❌ Failed to connect to server.");
+    }
+}
+
+// ===== WELCOME MESSAGE ALWAYS ON LOAD =====
+function showWelcomeMessage() {
+    const welcome = 
+        "👋 Hello! I'm your Healthcare Assistant.\n" +
+        "Ask me anything about symptoms, sleep, stress, nutrition, hydration, or general wellness.\nHow can I help you today?";
+
+    typeBotMessage(welcome, false); // DO NOT save welcome in history
+}
+
+// ===== ON PAGE LOAD =====
+window.onload = () => {
+    showWelcomeMessage();  // ALWAYS SHOW WELCOME
+    loadHistory();         // And load previous messages
+};
+</script>
+
+</body>
+</html>
